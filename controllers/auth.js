@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv"
 
 export const getUsers = async (req, res) => {
   try {
@@ -44,18 +45,18 @@ export const loginUser = async (req, res) => {
 
     const passwordCorrect = await bcrypt.compareSync(
       password,
-      foundUser.password
+      user.password
     );
     if (passwordCorrect) {
-      const { _id, email } = foundUser;
+      const { _id, email } = user;
 
       const payload = { _id, email };
 
-      const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      const authToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
         algorithm: "HS256",
-        expiresIn: "6h",
+        expiresIn: "2h",
       });
-      res.status(200).json({ authToken: authToken });
+      res.status(200).json({auth: true, authToken: authToken });
     } else {
       res.status(401).json({ message: "Unable to authenticate the user" });
     }
@@ -63,3 +64,16 @@ export const loginUser = async (req, res) => {
     console.log(err);
   }
 };
+
+export const isUserAuth = async (req, res) => {
+  res.send(`You are authenticated congrats`)
+}
+
+export const getCurrentUser = async (req, res) => {
+  try{
+    const user = await User.findById(req.userId)
+    res.send(user.name)
+  }catch (err){
+    res.send(err)
+  }
+}
