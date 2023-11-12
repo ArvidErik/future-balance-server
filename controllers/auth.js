@@ -28,6 +28,23 @@ export const createUser = async (req, res) => {
   }
 };
 
+export const signup = async (req, res) => {
+  try {
+    const { name, password, email } = req.body;
+
+    // Encrypting password
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = { name, password: hashedPassword, email };
+    const result = await User.create(user);
+    res.status(200).json({ result, message: "SUCCESS" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -56,7 +73,7 @@ export const loginUser = async (req, res) => {
         algorithm: "HS256",
         expiresIn: "2h",
       });
-      res.status(200).json({auth: true, authToken: authToken });
+      res.status(200).json({auth: true, authToken: authToken, name: user.name, id: user._id });
     } else {
       res.status(401).json({ message: "Unable to authenticate the user" });
     }
@@ -72,7 +89,7 @@ export const isUserAuth = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
   try{
     const user = await User.findById(req.userId)
-    res.send(user.name)
+    res.send( {username: user.name, userId: user._id} )
   }catch (err){
     res.send(err)
   }
