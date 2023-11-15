@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import dotenv from "dotenv"
 import userRoutes from "./routes/auth.js";
+import transactionRoutes from "./routes/transaction.js";
 import cors from "cors"
 
 // CONFIGURATIONS
@@ -22,6 +23,8 @@ app.use(cors(corsOptions));
 // ROUTES
 
 app.use("/users", userRoutes);
+app.use("/transactions", transactionRoutes);
+
 
 
 // MONGOOSE SETUP
