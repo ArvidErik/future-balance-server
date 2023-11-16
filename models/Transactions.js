@@ -1,4 +1,6 @@
 import mongoose from "mongoose"
+import { Schema } from "mongoose"
+
 
 const TransactionSchema = new mongoose.Schema(
     {

@@ -1,4 +1,4 @@
-// import Transaction from "../models/Transactions.js";
+import Transaction from "../models/Transactions.js";
 
 export const createTransaction = async (req, res) => {
 
@@ -6,11 +6,14 @@ export const createTransaction = async (req, res) => {
   const transactions = transactionGenerate(name, amount, from, to, type, ownerId)
 
   try {
-    res.json(transactions)
+    const createdTransactions = await Transaction.create(transactions)
+    res.status(200).json(createdTransactions)
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
 };
+
+//FUNCTIONS
 
 function transactionGenerate(name, amount, from, to, type, ownerId) {
   const output = [];
