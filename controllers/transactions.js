@@ -1,17 +1,54 @@
-import Transaction from "../models/Transactions.js";
+import Transaction from "../models/Transaction.js";
+import TransactionFamily from "../models/TransactionFamily.js";
 
 export const createTransaction = async (req, res) => {
 
   const { name, amount, from, to, type, ownerId } = req.body;
   const transactions = transactionGenerate(name, amount, from, to, type, ownerId)
+  const transactionFamily = {
+    name: name,
+    amount: amount,
+    from: from,
+    to: to,
+    type: type,
+    owner: ownerId
+  }
 
   try {
     const createdTransactions = await Transaction.create(transactions)
+    const createdTransactionFamily = await TransactionFamily.create(transactionFamily)
     res.status(200).json(createdTransactions)
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
+
 };
+
+export const getTransactionFamilies = async (req, res) => {
+
+  const output = []
+  const userid = req.headers.userid
+
+  try {
+    const getTransactions = await TransactionFamily.find({owner: userid})
+    getTransactions.forEach((transaction)=>{
+      const unit = {
+        _id: transaction._id,
+        name: transaction.name,
+        amount: transaction.amount,
+        from: transaction.from,
+        to: transaction.to
+      }
+      output.push(unit)
+    })
+
+    res.status(200).json(output)
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+
 
 //FUNCTIONS
 
