@@ -108,7 +108,33 @@ export const getBalanceData = async (req, res) => {
       }
     }
   })
-    res.status(200).json(output)
+
+  const currentDate = new Date();
+  const monthsData = [];
+  let prevValue = 0
+
+  for (let i = 0; i < 36; i++) {
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(currentDate.getMonth() + i);
+
+    const formattedDate = `${(nextMonth.getMonth() + 1).toString().padStart(2, '0')}-${nextMonth.getFullYear()}`;
+    
+
+    if (output.some(obj => Object.values(obj).includes(formattedDate))) {
+      const element = output.find(obj => Object.values(obj).includes(formattedDate))
+      prevValue = prevValue + Number(element.y)
+    }
+
+    // You can modify this part to include the specific values you need for each month
+    const monthData = {
+      x: formattedDate,
+      y: prevValue
+    };
+
+    monthsData.push(monthData);
+  }
+
+    res.status(200).json(monthsData)
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
