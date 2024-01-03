@@ -3,14 +3,6 @@ import TransactionFamily from "../models/TransactionFamily.js";
 
 export const createTransaction = async (req, res) => {
   const { name, amount, from, to, type, ownerId } = req.body;
-  const transactions = transactionGenerate(
-    name,
-    amount,
-    from,
-    to,
-    type,
-    ownerId
-  );
   const transactionFamily = {
     name: name,
     amount: amount,
@@ -21,10 +13,19 @@ export const createTransaction = async (req, res) => {
   };
 
   try {
-    const createdTransactions = await Transaction.create(transactions);
     const createdTransactionFamily = await TransactionFamily.create(
       transactionFamily
     );
+    const transactions = transactionGenerate(
+      name,
+      amount,
+      from,
+      to,
+      type,
+      ownerId,
+      createdTransactionFamily._id
+    );
+    const createdTransactions = await Transaction.create(transactions);
     res.status(200).json(createdTransactions);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -119,9 +120,22 @@ export const getCurrentBalance = async (req, res) => {
   }
 };
 
+export const deleteTransaction = async (req, res) => {
+  const userid = req.headers.userid;
+  const {transactionId} = req.body
+
+  try {
+    const deleteTransactionFamily = await TransactionFamily.deleteOne({_id: transactionId})
+    const deleteTransactions = await Transaction.deleteMany({family: transactionId})
+    res.status(200).json(deleteTransactions)
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+}
+
 //FUNCTIONS
 
-function transactionGenerate(name, amount, from, to, type, ownerId) {
+function transactionGenerate(name, amount, from, to, type, ownerId, family) {
   const output = [];
   const startDate = new Date(`${from}`);
   const numberOfMonths = calculateMonthsDifference(from, to);
@@ -139,6 +153,7 @@ function transactionGenerate(name, amount, from, to, type, ownerId) {
       dueDate: currentMonth,
       type: type,
       owner: ownerId,
+      family: family
     });
   }
 

@@ -23,6 +23,9 @@ const TransactionSchema = new mongoose.Schema(
         },
         owner: {
             type: Schema.Types.ObjectId, ref: "User"
+        },
+        family: {
+            type: Schema.Types.ObjectId, ref: "TransactionFamily"
         }
     },
     { timestamps: true}
