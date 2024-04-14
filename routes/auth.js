@@ -5,7 +5,6 @@ import { verifyJWT } from "../middlewares/auth.js";
 const router = express.Router();
 
 router.get("/", getUsers);
-router.post("/create", createUser);
 router.post("/signup", signup);
 router.post("/login", loginUser);
 router.get("/isauth", verifyJWT, isUserAuth);
